@@ -1,3 +1,12 @@
+#### Preamble ####
+# Purpose: Scrape and clean data from https://en.wikipedia.org/wiki/List_of_prime_ministers_of_Australia
+# Author: Rohan Alexander modified by Samantha Barfoot
+# Date: 25 February 2024
+# License: MIT
+# code was taken from:
+#   Alexander, R. (2023, July 27). Telling Stories with Data - 7 Gather data. 
+#     Telling Stories With Data. https://tellingstorieswithdata.com/07-gather.html#exercises
+
 ### Libraries ###
 #install.packages('janitor')
 library(tidyverse)
@@ -7,27 +16,7 @@ library(xml2)
 library(janitor)
 library(knitr)
 
-set.seed(853)
-
-### Simulate ####
-simulated_dataset <-
-  tibble(
-    prime_minister = babynames |>
-      filter(prop > 0.01) |>
-      distinct(name) |>
-      unlist() |>
-      sample(size = 10, replace = FALSE),
-    birth_year = sample(1700:1990, size = 10, replace = TRUE),
-    years_lived = sample(50:100, size = 10, replace = TRUE),
-    death_year = birth_year + years_lived
-  ) |>
-  select(prime_minister, birth_year, death_year, years_lived) |>
-  arrange(birth_year)
-
-simulated_dataset
-
 ### Scrape Data ###
-
 raw_data <-
   read_html(
     "https://en.wikipedia.org/wiki/List_of_prime_ministers_of_Australia"
@@ -83,23 +72,5 @@ cleaned_data |>
 
 write_csv(
   x = cleaned_data,
-  file = "cleaned_data.csv"
+  file = "outputs/data/cleaned_data.csv"
 )
-
-# ### PLOT ###
-# cleaned_data |>
-#   mutate(
-#     still_alive = if_else(is.na(died), "Yes", "No"),
-#     died = if_else(is.na(died), as.integer(2024), died)
-#   ) |>
-#   mutate(name = as_factor(name)) |>
-#   ggplot(
-#     aes(x = born, xend = died, y = name, yend = name, color = still_alive)
-#   ) +
-#   geom_segment() +
-#   labs(
-#     x = "Year of birth", y = "Prime minister", color = "PM is currently alive"
-#   ) +
-#   theme_minimal() +
-#   scale_color_brewer(palette = "Set1") +
-#   theme(legend.position = "bottom")

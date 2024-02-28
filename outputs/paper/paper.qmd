@@ -1,0 +1,91 @@
+---
+title: "Prime Ministers of Australia"
+subtitle: "Tutorial 7"
+author: Samantha Barfoot
+format: pdf
+thanks: "Code and data are available at: "
+date: today
+date-format: long
+bibliography: references.bib
+number-sections: true
+---
+```{r}
+#| echo: false
+#| include: true
+#| warning: false
+
+# Loading libraries
+library(tidyverse)
+library(rvest)
+library(xml2)
+library(janitor)
+library(knitr)
+library(ggplot2)
+```
+
+# Findings
+
+@fig-graph1 graphs the life span of all former and current Australian prime ministers with the prime ministers that are still alive marked in blue. Whereas, the deceased presents are the ones marked in red. The prime ministers are also graphed in order from the first prime minister to the current prime minister starting at the bottom and making our way to the top. 
+
+Looking at @fig-graph1 we can make a few observations. We can see that the majority of the prime ministers live for a long time. This is interesting given that the timeline is fairly large. The first prime minister was in 1901 and the most recent one was in 2022. From the list of prime ministers, we can also see that there has only been one female prime minister in this 120-year range, Julia Gillard. 
+
+One interesting aspect that, just by looking at the date of birth, we can see in @fig-graph1 is how the ages of election greatly range. For example, the 26th prime minister, Kevin Rudd, was born in 1957 and the 29th prime minister, Malcolm Turnball was elected 10 years and three prime ministers later despite being even older than Kevin Rudd. I think that it is interesting how the age of a given prime minister does not affect them being elected. We can also see that there are a fair amount of former prime ministers still alive, eight of them in total including the current prime minister.
+
+Some aspects that we can not see on @fig-graph1 are the prime minister's affiliated political party, their age at death, and age at appointment. All of these would be interesting aspects that could be added in the future. 
+
+The analysis and graphs in this assignment were created with R in RStudio [@citeR]. To create @fig-graph1 I used the packages `tiddyverse` [@tidyverseRef], `rvest` [@rvestRef], `xml2`[@xmlRef], `janitor` [@janitorRef], `knitr` [@knitrRef], and `ggplot2` [@ggplotRef]. I scraped data from the Wikipedia page *List of Prime Ministers of Australia* using code from @rohan. 
+
+```{r}
+#| echo: false
+#| include: true
+#| warning: false
+#| label: fig-graph1
+#| fig-subcap: "Graph of all Australian Prime Ministers and their life span"
+#| fig-height: 5
+
+# Loading in cleaned data
+cleaned_data <-
+  read_csv(
+    file = "../data/cleaned_data.csv",
+    show_col_types = FALSE,
+  )
+
+# Plotting data
+cleaned_data |>
+  mutate(
+    still_alive = if_else(is.na(died), "Yes", "No"),
+    died = if_else(is.na(died), as.integer(2024), died)
+  ) |>
+  mutate(name = as_factor(name)) |>
+   ggplot(
+     aes(x = born, xend = died, y = name, yend = name, color = still_alive)
+   ) +
+   geom_segment()+
+  labs(
+    x = "Year of birth", y = "Prime minister", color = "PM is currently alive"
+  ) +
+  theme_minimal() +
+  scale_color_brewer(palette = "Set1") +
+  theme(legend.position = "bottom")
+```
+
+# Data 
+
+The data used to create this graph was web scraped from the Wikipedia page *List of prime ministers of Australia* using `rvest` using `read_html()`. SelectorGadget was then used to select the table of prime ministers from the page to use as the data. This table contained 31 prime ministers and included their portraits, names, birth and death dates, office terms, and other data that were not relevant to the assignment. For @fig-graph1 we only need to know the prime minister's name, birth date, and death date.
+
+After web scraping the data needed to be cleaned extensively. Initially, a tibble was created with the uncleaned data. Then the data was cleaned by removing all information other than the prime minister's name and birth and death dates. Next, the birth and death dates were separated into two different columns, and the age at death of the prime minister was calculated. For the prime ministers that were still alive, the death year and age at death columns were filled as "NA". From this tibble, the graph could be created as seen in @fig-graph1. 
+
+# What Took Longer Than Expected
+
+One aspect of this assignment that took longer than expected was plotting the prime ministers who were still alive. Since they had no death date this created difficulties in trying to display their lifespan on the graph. Initially, they would not appear on the graph at all. Eventually, I realized that this was because the string being extracted from the scrapped data was not being cleaned and extracted properly. This is because in the script I was assuming that they would have a four-character death date included in the original table. After fixing this issue they were properly plotted on @fig-graph1.  
+
+# When It Became Fun
+
+One aspect of the assignment that I liked was practicing web scraping. I found it rally interesting that with a few lines of code, I could collect all the data I needed for @fig-graph1. This is something that I have never done before so I found it really interesting.
+
+# What I Would Do Differently
+
+Something that I would do differently would be to also include the political party each prime minister was affiliated with. I think that it would be interesting to see how the political party changed over the century. It would also be interesting to see the frequency of how many prime ministers were a part of each party. This could be done by including this information in the same graph or creating a separate one just for political parties. 
+
+# References
+
