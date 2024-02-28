@@ -3,7 +3,7 @@ title: "Prime Ministers of Australia"
 subtitle: "Tutorial 7"
 author: Samantha Barfoot
 format: pdf
-thanks: "Code and data are available at: "
+thanks: "Code and data are available at: https://github.com/SamanthaBarfoot/Tutorial-7.git"
 date: today
 date-format: long
 bibliography: references.bib
